@@ -1,0 +1,17 @@
+[mysqld]
+datadir         = /var/lib/mysql
+socket          = /run/mysqld/mysqld.sock
+bind-address    = 0.0.0.0
+port            = 3306
+user            = mysql
+pid-file        = /run/mysqld/mysqld.pid
+
+# Logging
+log_error       = /var/log/mysql/error.log
+
+# Character set
+character-set-server  = utf8mb4
+collation-server      = utf8mb4_general_ci
+
+# Skip name resolution for faster connections
+skip-name-resolve
