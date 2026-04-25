@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+MYSQL_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
+MYSQL_PASSWORD=$(cat /run/secrets/db_password)
+
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo "[i] Initializing MariaDB data directory..."
     mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null
@@ -10,13 +13,11 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     mysqld --user=mysql --skip-networking &
     TEMP_PID=$!
 
-    # 임시 서버가 뜰 때까지 대기
     while ! mysqladmin ping --socket=/run/mysqld/mysqld.sock --silent 2>/dev/null; do
         sleep 1
     done
     echo "[i] Temporary server is up."
 
-    # 유저와 DB 생성
     mysql --socket=/run/mysqld/mysqld.sock << EOF
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
@@ -29,7 +30,6 @@ EOF
 
     echo "[i] Users and database created."
 
-    # 임시 서버 종료
     mysqladmin shutdown --socket=/run/mysqld/mysqld.sock
     wait $TEMP_PID
     echo "[i] Temporary server stopped."

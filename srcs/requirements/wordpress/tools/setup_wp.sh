@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+# Read secrets from Docker secrets files
+MYSQL_PASSWORD=$(cat /run/secrets/db_password)
+WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_admin_password | cut -d':' -f2)
+WP_ADMIN_USER=$(cat /run/secrets/wp_admin_password | cut -d':' -f1)
+WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
+
 # Wait for MariaDB to be ready
 echo "[i] Waiting for MariaDB..."
 while ! mysqladmin ping -h mariadb -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" --silent 2>/dev/null; do
@@ -10,7 +16,6 @@ echo "[i] MariaDB is ready."
 
 cd /var/www/html
 
-# WordPress 설치 여부는 wp-config.php로 판단
 if [ ! -f wp-config.php ]; then
 
     echo "[i] Downloading WordPress..."
