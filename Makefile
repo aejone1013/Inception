@@ -1,39 +1,17 @@
-NAME = inception
-
-# Create volume directories on host if they don't exist
-VOLUMES_DIR = /home/jaoh/data
-
-all: setup
-	docker compose -f srcs/docker-compose.yml up --build -d
-
-setup:
-	@mkdir -p $(VOLUMES_DIR)/wordpress
-	@mkdir -p $(VOLUMES_DIR)/mariadb
+up:
+	mkdir -p /home/jaoh/data/mariadb /home/jaoh/data/wordpress
+	docker compose -f srcs/docker-compose.yml up -d --build
 
 down:
 	docker compose -f srcs/docker-compose.yml down
 
-stop:
-	docker compose -f srcs/docker-compose.yml stop
-
-start:
-	docker compose -f srcs/docker-compose.yml start
-
-restart:
-	docker compose -f srcs/docker-compose.yml restart
-
 logs:
-	docker compose -f srcs/docker-compose.yml logs -f
+	docker logs nginx --tail 50
 
-# Stop and remove containers, networks
-clean: down
+clean:
+	docker compose -f ./srcs/docker-compose.yml down --remove-orphans --volumes
 
-# Also remove volumes and images
-fclean: down
-	docker compose -f srcs/docker-compose.yml down -v --rmi all 2>/dev/null || true
-	@sudo rm -rf $(VOLUMES_DIR)/wordpress/*
-	@sudo rm -rf $(VOLUMES_DIR)/mariadb/*
-
-re: fclean all
-
-.PHONY: all setup down stop start restart logs clean fclean re
+fclean:
+	docker compose -f ./srcs/docker-compose.yml down --remove-orphans --volumes
+	docker system prune -a
+	sudo rm -rf /home/jaoh/data/mariadb /home/jaoh/data/wordpress

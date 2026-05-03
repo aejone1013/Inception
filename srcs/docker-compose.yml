@@ -1,80 +1,69 @@
-version: '3.8'
-
+#version: '3.8'
 services:
-  nginx:
-    build: ./requirements/nginx
-    container_name: nginx
-    image: nginx
-    ports:
-      - "443:443"
-    volumes:
-      - wp_data:/var/www/html
-    networks:
-      - inception
-    depends_on:
-      - wordpress
+  # Container internal address (hostname) : The address (service name) that containers look up for each other within a Docker network
+  mariadb:
+    build: ./requirements/mariadb
+    image: mariadb
+    hostname: mariadb
+    container_name: mariadb
     restart: always
-    env_file:
-      - .env
+    expose:
+      - "3306"
+    #ports: 
+    # - 3306:3306
+    env_file: .env
+    volumes:
+    - mariadb_data:/var/lib/mysql
+    networks:
+    - inception
 
   wordpress:
     build: ./requirements/wordpress
-    container_name: wordpress
     image: wordpress
-    volumes:
-      - wp_data:/var/www/html
-    networks:
-      - inception
+    container_name: wordpress
+    hostname: wordpress
+    restart: always
+    expose:
+      - "9000"
+    #ports: 
+    #  - 9000:9000
+    env_file: .env
     depends_on:
-      - mariadb
-    restart: always
-    env_file:
-      - .env
-    secrets:
-      - db_password
-      - wp_admin_password
-      - wp_user_password
-
-  mariadb:
-    build: ./requirements/mariadb
-    container_name: mariadb
-    image: mariadb
+    - mariadb
     volumes:
-      - db_data:/var/lib/mysql
+    - wordpress_data:/var/www/wordpress
     networks:
-      - inception
+    - inception
+
+  nginx:
+    build: ./requirements/nginx #Dockerfile location
+    image: nginx
+    container_name: nginx
+    hostname: nginx
     restart: always
-    env_file:
-      - .env
-    secrets:
-      - db_password
-      - db_root_password
+    depends_on:
+    - wordpress
+    ports:
+      - "443:443" #host:container
+    volumes:
+      - wordpress_data:/var/www/wordpress
+    networks:
+    - inception # nginx <-> wordpress <-> mariadb connect
 
 volumes:
-  wp_data:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/jaoh/data/mariadb
+  wordpress_data:
     driver: local
     driver_opts:
       type: none
       o: bind
       device: /home/jaoh/data/wordpress
 
-  db_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /home/jaoh/data/mariadb
-
 networks:
   inception:
     driver: bridge
-
-secrets:
-  db_password:
-    file: ../secrets/db_password.txt
-  db_root_password:
-    file: ../secrets/db_root_password.txt
-  wp_admin_password:
-    file: ../secrets/credentials.txt
-  wp_user_password:
-    file: ../secrets/wp_user_password.txt

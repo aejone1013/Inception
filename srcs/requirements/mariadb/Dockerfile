@@ -1,20 +1,13 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
-RUN apt-get update && apt-get install -y \
-    mariadb-server \
-    mariadb-client \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y mariadb-server \
+	&& rm -rf /var/lib/apt/lists/*
 
-# Copy the initialization script
-COPY tools/init_db.sh /usr/local/bin/init_db.sh
-RUN chmod +x /usr/local/bin/init_db.sh
+COPY conf/my.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+COPY ./tools/init_db.sh /init_db.sh
 
-# Copy custom MariaDB config
-COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
-
-# Create run directory for mysqld socket
-RUN mkdir -p /run/mysqld && chown mysql:mysql /run/mysqld
+RUN chmod +x /init_db.sh
 
 EXPOSE 3306
 
-ENTRYPOINT ["init_db.sh"]
+CMD ["/init_db.sh"]

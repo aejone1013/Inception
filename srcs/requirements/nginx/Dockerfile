@@ -1,24 +1,22 @@
-FROM debian:bullseye
+# Getting a Linux OS : base image : [image name]:[version tag]
+FROM debian:bookworm
 
-RUN apt-get update && apt-get install -y \
-    nginx \
-    openssl \
-    && rm -rf /var/lib/apt/lists/*
+# Package Installation: nginx (web server), openssl (certificate generation tool)
+RUN apt-get update && apt-get install -y nginx openssl procps netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
-# Generate self-signed TLS certificate
-RUN mkdir -p /etc/nginx/ssl \
-    && openssl req -x509 -nodes -days 365 \
-    -keyout /etc/nginx/ssl/nginx.key \
-    -out /etc/nginx/ssl/nginx.crt \
-    -subj "/C=KR/ST=Seoul/L=Seoul/O=42/OU=42Seoul/CN=jaoh.42.fr"
+# Make SSL
+RUN openssl req -x509 -nodes -days 365 \
+	-newkey rsa:2048 \
+	-keyout /etc/ssl/private/server.key\
+	-out /etc/ssl/certs/server.crt \
+	-subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=jihyeki2.42.fr"
 
-# Copy nginx configuration
-COPY conf/nginx.conf /etc/nginx/conf.d/default.conf
+COPY conf/default.conf /etc/nginx/conf.d/default.conf
+COPY tools/start.sh /start.sh
 
-# Remove default nginx config that may conflict
-RUN rm -f /etc/nginx/sites-enabled/default
+RUN chmod +x /start.sh
 
+# Port
 EXPOSE 443
 
-# Run nginx in foreground (PID 1)
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+CMD ["/start.sh"]
