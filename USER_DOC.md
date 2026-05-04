@@ -58,7 +58,7 @@ This stops and removes the containers. Data in volumes is preserved.
 Open your browser and go to:
 
 ```
-https://jihyeki2.42.fr
+https://jaoh.42.fr
 ```
 
 A browser warning about the certificate may appear. This is expected because a self-signed certificate is used. Proceed past the warning to access the site.
@@ -66,7 +66,7 @@ A browser warning about the certificate may appear. This is expected because a s
 If the domain does not resolve, add it to `/etc/hosts`:
 
 ```bash
-echo "127.0.0.1 jihyeki2.42.fr" | sudo tee -a /etc/hosts
+echo "127.0.0.1 jaoh.42.fr" | sudo tee -a /etc/hosts
 ```
 
 ---
@@ -75,7 +75,7 @@ echo "127.0.0.1 jihyeki2.42.fr" | sudo tee -a /etc/hosts
 
 To access the administration dashboard:
 
-1. Go to `https://jihyeki2.42.fr/wp-admin`
+1. Go to `https://jaoh.42.fr/wp-admin`
 2. Log in with the admin credentials defined in `srcs/.env`
 
 ```
@@ -143,10 +143,10 @@ docker logs mariadb
 
 ```bash
 # HTTPS should work (200 OK)
-curl -kI https://jihyeki2.42.fr
+curl -kI https://jaoh.42.fr
 
 # HTTP should not work (connection refused)
-curl -I http://jihyeki2.42.fr
+curl -I http://jaoh.42.fr
 ```
 
 ---
@@ -156,8 +156,8 @@ curl -I http://jihyeki2.42.fr
 All data is stored on the host machine at:
 
 ```
-/home/jihyeki2/data/mariadb    <- database files
-/home/jihyeki2/data/wordpress  <- WordPress site files
+/home/jaoh/data/mariadb    <- database files
+/home/jaoh/data/wordpress  <- WordPress site files
 ```
 
 Data is preserved when containers are stopped or the VM is rebooted. Simply run `make up` again to restore the full state.

@@ -76,7 +76,7 @@ vim srcs/.env
 Fill in all values:
 
 ```env
-DOMAIN_NAME=jihyeki2.42.fr
+DOMAIN_NAME=jaoh.42.fr
 
 MYSQL_DATABASE=wordpress
 MYSQL_USER=<db_user>
@@ -98,7 +98,7 @@ make up
 ```
 
 This command:
-1. Creates `/home/jihyeki2/data/mariadb` and `/home/jihyeki2/data/wordpress` on the host
+1. Creates `/home/jaoh/data/mariadb` and `/home/jaoh/data/wordpress` on the host
 2. Builds all three Docker images from their respective Dockerfiles
 3. Starts all containers in detached mode
 
@@ -139,8 +139,8 @@ Two named volumes are used:
 
 | Volume name | Host path | Container path |
 |-------------|-----------|----------------|
-| `mariadb_data` | `/home/jihyeki2/data/mariadb` | `/var/lib/mysql` |
-| `wordpress_data` | `/home/jihyeki2/data/wordpress` | `/var/www/wordpress` |
+| `mariadb_data` | `/home/jaoh/data/mariadb` | `/var/lib/mysql` |
+| `wordpress_data` | `/home/jaoh/data/wordpress` | `/var/www/wordpress` |
 
 Volumes are defined as named volumes with `driver: local` and `driver_opts` to bind to the specified host paths. Data persists across container restarts and VM reboots.
 
@@ -197,23 +197,23 @@ SELECT user_login, user_email FROM wp_users;
 
 ```bash
 # TLSv1.2 must work
-openssl s_client -connect jihyeki2.42.fr:443 -tls1_2
+openssl s_client -connect jaoh.42.fr:443 -tls1_2
 
 # TLSv1.3 must work
-openssl s_client -connect jihyeki2.42.fr:443 -tls1_3
+openssl s_client -connect jaoh.42.fr:443 -tls1_3
 
 # TLSv1.1 must NOT work
-openssl s_client -connect jihyeki2.42.fr:443 -tls1_1
+openssl s_client -connect jaoh.42.fr:443 -tls1_1
 ```
 
 ### Verify ports
 
 ```bash
 # Port 443 must respond
-curl -kI https://jihyeki2.42.fr
+curl -kI https://jaoh.42.fr
 
 # Port 80 must NOT respond
-curl -I http://jihyeki2.42.fr
+curl -I http://jaoh.42.fr
 ```
 
 ---
@@ -258,7 +258,7 @@ make up
 | HTTPS with TLSv1.2 or TLSv1.3 only | ✅ |
 | Only port 443 exposed externally | ✅ |
 | Docker named volumes for persistence | ✅ |
-| Data stored at /home/jihyeki2/data/ | ✅ |
+| Data stored at /home/jaoh/data/ | ✅ |
 | Custom Docker bridge network | ✅ |
 | Environment variables via .env | ✅ |
 | No passwords in Dockerfiles | ✅ |
